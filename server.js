@@ -8,10 +8,12 @@ const pool = workerpool.pool();
 
 const axios = require('axios');
 
+app.get("/", (req, res) => {
+  return res.send("Hello World!");
+});
 
 app.get("/default-request/", (req, res) => {
   let sum = 0;
-  console.log("req started")
   for (let i = 0; i < 999999999; i++) {
     sum += i;
   }
@@ -19,7 +21,7 @@ app.get("/default-request/", (req, res) => {
 })
 
 app.get("/worker-request/", (req, res) => {
-  pool.exec(function () {
+  pool.exec(() => {
     let sum = 0;
     for (let i = 0; i < 999999999; i++) {
       sum += i;
@@ -27,7 +29,7 @@ app.get("/worker-request/", (req, res) => {
     return sum;
   }).then((data) => {
     return res.send("worker request completed! result: " + data);
-  }).then(function () {
+  }).then(() => {
     pool.terminate(); // terminate all workers when done
   });
 })
@@ -40,9 +42,8 @@ app.get("/child-process-request/", async (req, res) => {
   return res.send("another process request completed! result: " + stdout);
 })
 
-app.get("/http-broker-request/", async (req, res) => {
+app.get("/http-process-request/", async (req, res) => {
   const rq = await axios.get("http://localhost:7000/");
-  console.log(rq.data);
   return res.send("another process request completed! result: " + rq.data);
 })
 
